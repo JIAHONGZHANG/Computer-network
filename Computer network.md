@@ -48,7 +48,9 @@
 
 - N条速率为R的链路组成的路径（N-1个路由器），从源到目的地发送一个分组：
 
-  ![Pic01](/Users/zhangjiahong/Desktop/Computer network/src/Pic01.png)
+  ![Pic01](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic01.png)
+
+  ​
 
   ​
 
