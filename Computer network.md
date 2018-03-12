@@ -50,10 +50,30 @@
 
   ![Pic01](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic01.png)
 
-  ​
+- 每个分组交换机有多条链路与之相连。对于每条相连的链路，该分组交换机具有**输出缓存**（output buffer）（也被称为**输出队列** output queue），它用于**存储路由器准备发往哪条链路的分组**。
 
-  ​
+- 如果到达的分组需要传输到某条链路，但发现该链路正在忙于传输其他分组，该到达分组必须**在输出缓存中等待**。因此，除了储存转发时延外，分组还要城市输出缓存的**排队时延**（queue delay）。
 
-  ​
+- 缓存空间有限，一个到达的分组可能发现该缓存已经被其他等待传输的分组完全充满。在此情况下，将出现**分组丢失**（丢包 packet lost）。
 
-  ​
+- 每台路由器具有一个**转发表**（forwarding table），用于将目的地的地址（或目的地地址的一部分）映射成为输出链路。
+
+- 电路交换（略）
+
+- 四种类型时延：**结点处理时延**（nodal processing delay）、**排队时延**（queuing delay）、**传输时延**（transmission delay）、**传播时延**（propagation delay），这些时延累加起来就是**结点总时延**（total nodal delay）。
+
+- 检查分组首部和决定将该分组导向何处多需要的时间是**处理时延**的一部分。
+
+- 在队列中，当分组在链路上等待传输时，它受到**排队时延**。
+
+- 传输时延见Pic01<https://github.com/JIAHONGZHANG/Computer-network/blob/master/src/Pic01.png>
+
+- 从该链路的起点到路由器B传播所需要的时间是**传播时延**。
+
+- 传输时延L/R，传播时延d/s。
+
+- 端到端时延，Pic02是Pic01的一般式
+
+  ![Pic02](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic02.png)
+
+- 计算机网络中的吞吐量（略）
