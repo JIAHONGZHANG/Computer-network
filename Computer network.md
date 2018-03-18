@@ -168,4 +168,42 @@
 
 - Date：首部行指示服务器产生并发送该响应报文的日期和时间，是服务器从它的文件系统中检索到该对象，插入到响应报文，并发送该报文的时间。
 
-  ​
+- cookie技术有四个组件：
+
+  1. 在HTTP响应报文中的一个cookie首部行；
+  2. 在HTTP请求报文中的一个cookie首部行；
+  3. 在用户端系统中保留一个cookie文件；
+  4. 位于web站点的一个后端数据库。
+
+- **Web缓存器**（ Web cache）也叫**代理服务器**（proxy server），它是能够代表初始Web服务器来满足HTTP请求的网络实体。
+
+- 条件GET方法
+
+  1. 请求报文使用GET方法；
+  2. 请求报文中含有一个“If-Modified-Since:” 首部行。
+
+- 文件传输协议（File Transfer Protocol, FTP）控制连接贯穿整个用户会话期间，但是会话中每一次传输文件都需要建立一个新的数据连接。
+
+- 因特网电子邮箱系统有三个主要的组成部分：
+
+  1. 用户代理（user agent）
+  2. 邮件服务器（mail server）
+  3. 简单邮件传输协议（Simple Mail Transfer Protocol, SMTP）
+
+- SMTP整个过程（假设Alice想给Bob发送一封简单的ASCII报文）：
+
+  1. Alice调用她的邮件代理程序并提供Bob的邮件地址，撰写报文，然后指示用户代理发送该报文；
+  2. Alice的用户代理把报文发给她的邮件服务器，在那里该报文放在报文队列中；
+  3. 运行在Alice的邮件服务器上的SMTP客户端发现报文队列中的该报文，它就创建一个到运行在Bob邮件服务器上的SMTP服务器的TCP连接；
+  4. 在经过一些初始的SMTP握手后，SMTP客户通过该TCP连接发送Alice的报文；
+  5. 在Bob的邮件服务器上SMTP的服务器接收到该报文。Bob的邮件服务器然后将该报文放入Bob的邮箱中；
+  6. 在Bob方便的时候，他调用用户代理阅读该报文。
+
+- SMTP、POP3、IMAP、HTTP
+
+  ![Pic05](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic05.png)
+
+  **邮件服务器和用户代理间连接为POP3、IMAP或者HTTP**，浏览器则为HTTP，其他邮件程序则为POP3或者IMAP。
+
+
+
