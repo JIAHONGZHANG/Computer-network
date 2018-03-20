@@ -205,5 +205,30 @@
 
   **邮件服务器和用户代理间连接为POP3、IMAP或者HTTP**，浏览器则为HTTP，其他邮件程序则为POP3或者IMAP。
 
+- 域名系统（Domain Name System, DNS）的主要任务是**进行主机名到IP地址转换**的目录服务。
+
+- DNS是：
+
+  1. 一个由分层的DNS服务器（DNS server）实现的分布式数据库；
+  2. 一个使得主机能够查询分布式数据库的应用层协议， DNS协议运行在UDP上，使用53号端口。
+
+- 根DNS服务器、顶级域（DNS）服务器、权威DNS服务器、本地DNS服务器
+
+  ![Pic06](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic06.png)
+
+- DNS缓存
+
+- 共同实现DNS分布式数据库的所有DNS服务器存储了**资源记录**（Resource Record, RR），RR提供了**主机名到IP地址的映射**。
+
+- RR是一个包含（Name, Value, Type, TTL）的4元组。TTL是该记录的生存时间。
+
+  1. 如果Type为A，则Name为主机名，Value为主机名对应的IP地址。因此，一个类型为A的资源记录了提供了标准的主机名到IP地址的映射；
+  2. 如果Type为NS，则Name是一个域（如 .com），而Value是知道如何获得这个域中主机IP地址的权威DNS服务器的主机名；
+  3. 如果Type为CNAME，则Value为别名为Name的主机对应的规范主机名。该记录能够向查询的主机提供一个主机名对应的规范主机名；
+  4. 如果Type为MX，则Value是个别名为Name的邮件服务器的规范主机名。
+
+- 权威DNS含有A记录，上层DNS则含有A记录和NS记录。
+
+- ​
 
 
