@@ -352,6 +352,10 @@
 
 - UDP报文段结构
 
-  ![Pic06](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic09.jpeg)
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic09.jpeg" width="200px" />
 
-- ​
+- UDP检验和
+
+  - 发送方的UDP对报文段中的所有16比特字的和进行反码运算，最后结果为检验和
+  - 接收方拿文段中的16比特字的和进行比较，如果最后为1111111111111111，则没有问题，否则溢出说明里面出现了改变，则回卷
+
