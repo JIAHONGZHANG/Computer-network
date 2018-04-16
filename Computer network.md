@@ -60,15 +60,21 @@
 
 - 每台路由器具有一个**转发表**（forwarding table），用于将目的地的地址（或目的地地址的一部分）映射成为输出链路。
 
-- 电路交换（略）
+- 电路交换（circuit switching）和分组交换（packet switching）是通过网络链路和交换机移动数据的两种基本的方法。考虑餐厅订餐服务属于电路交换，不订餐服务属于分组交换。
+
+  假设两台临近交换机之间的每条链路具有1Mbps传输速率，总共有四台主机，则每个端到端电路交换连接获得250kbps专用的传输速率。 
 
 - 四种类型时延：**结点处理时延**（nodal processing delay）、**排队时延**（queuing delay）、**传输时延**（transmission delay）、**传播时延**（propagation delay），这些时延累加起来就是**结点总时延**（total nodal delay）。
 
 - 检查分组首部和决定将该分组导向何处多需要的时间是**处理时延**的一部分。
 
-- 在队列中，当分组在链路上等待传输时，它受到**排队时延**。
+- 在队列中，当分组在链路上等待传输时，它受到**排队时延**，同时排队时延是**最容易影响**网络加载。
 
-- 传输时延见Pic01<https://github.com/JIAHONGZHANG/Computer-network/blob/master/src/Pic01.png>
+- 传输时延
+  $$
+  d_{端到端}=N{L\over{R}}
+  $$
+  ​
 
 - 从该链路的起点到路由器B传播所需要的时间是**传播时延**。
 
@@ -82,9 +88,19 @@
 
 - 计算机网络中的吞吐量（略）
 
-- 各层的所有协议被称为**协议栈**（protocol stack）。因特网的协议栈由5个层次组成：**物理层**、**链路层**、**网络层**、**运输层**、**应用层**。
+- 各层的所有协议被称为**协议栈**（protocol stack）。因特网的协议栈由5个层次组成：
 
-- 应用层是网络应用程序及它们的应用层协议存留的地方。因特网的应用层包括**HTTP**（提供web文档的请求和传送），**SMTP**（提供电子邮件报文的传输）和**FIP**（提供两个端系统之间的文件传送）。这种位于应用层的信息分组称为**报文**（message）。
+  |       中文名       |      英文名       |
+  | :----------------: | :---------------: |
+  |       应用层       | Application layer |
+  |       运输层       |  Transport layer  |
+  | 网络层（一种协议） |   Network layer   |
+  |       链路层       |  Data link layer  |
+  |       物理层       |  Physical layer   |
+
+  ​
+
+- 应用层是网络应用程序及它们的应用层协议存留的地方。因特网的应用层包括**HTTP**（提供web文档的请求和传送），**SMTP**（提供电子邮件报文的传输）和**FTP**（提供两个端系统之间的文件传送）。这种位于应用层的信息分组称为**报文**（message）。
 
 - 运输层在应用程序端点之间传送应用层报文。两个运输协议，**TCP**和**UDP**，利用其中任意一个都能运输应用层报文。我们把运输层分组称为**报文段**（segment）。
 
@@ -105,7 +121,6 @@
 - 物理层（略）
 
 - 封装（略）
-
 
 
 ## Chapter 2
@@ -144,13 +159,23 @@
 
 - Web的应用层协议是超文本传输协议（HyperText Transfer Protocol, HTTP）。HTTP定义了这些报文的结构以及客户和服务器进行报文交换的方式。**HTTP使用了TCP作为它的支撑运输协议**。
 
+  HTTP/1.0包括的方法有：GET、POST和HEAD
+
+  HTTP/1.1包括的方法有：GET、POST、HEAD、PUT、DELETE、TRACE、OPTIONS、CONNECT、PATCH
+
 - 服务器向客户发送被请求的文件，而不存储如何关于该客户的状态信息。所以HTTP是一个**无状态协议**（stateless protocol）。
 
-- **往返时间**（Round-Trip Time, RTT）：指一个短分组从客户到服务器再返回客户所花费的时间。
+- RTT的定义：
+
+  > We define the round-trip time, which is the time it takes for a small packet to travel from client to server and back to the client. The RTT includes packet-progation delays, packet-queuing delay and packet-processing delay
 
 - HTTP非持续连接总响应时间大致为RTT+RTT+服务器传输HTML文件的时间。
 
 - HTTP持续连接。
+
+- 关于HTTP持续连接和非持续连接的问题：
+
+  ![Pic07](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic07.png)
 
 - HTTP请求报文
 
@@ -175,7 +200,9 @@
   3. 在用户端系统中保留一个cookie文件；
   4. 位于web站点的一个后端数据库。
 
-- **Web缓存器**（ Web cache）也叫**代理服务器**（proxy server），它是能够代表初始Web服务器来满足HTTP请求的网络实体。
+- **Web缓存器**（ Web cache）也叫**代理服务器**（proxy server），它是能够代表初始Web服务器来满足HTTP请求的网络实体。**Web 缓存器**是**内容分发网络**（Content Distribution Network, **CDN**）的一部分。
+
+  具体CDN和web cache不同之处见 <https://www.quora.com/How-is-CDN-different-from-caching>
 
 - 条件GET方法
 
@@ -229,6 +256,102 @@
 
 - 权威DNS含有A记录，上层DNS则含有A记录和NS记录。
 
+- CDN范例：
+
+  ![Pic06](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic08.png)
+
+- Time to distribute F to N clients using client-server approach
+
+  $$D_{c-s}\ge max \{ {NF/u_s}{,F/d_{min}}\}$$
+
+  F	file size F
+
+  $$u_s$$	server upload capacity
+
+  $$d_i$$	peer i download capacity 
+
+  $$u_i$$	peer i upload capacity
+
+- Time to distribute F to N clients using P2P approach
+
+  $$D_{P2P}\ge max\{ {F/u_s},{F/d_{min},{NF/(u_s+\sum{u_i})}}\}$$
+
+- **BitTorrent**是一种用于**文件分发**的流行**P2P协议**。参与一个特定文件的分发的所有对等方的集合被称为一个**洪流**（torrent）。在一个洪流中的对等方彼此下载等长度的**文件块**（chunk），典型的块长度为**256KB**。
+
+- 每个洪流中具有一个基础设施结点，称为**追踪器**（tracker）。当一个对等方加入某个洪流中，它向追踪器**注册自己**，并**周期性**地通知追踪器它仍在洪流中。通过这种方式，追踪器**追踪**参与洪流中的对等方。
+
+-  假设一个对等方Alice，她有很多个临近对等方。
+
+  - 在任何给定的时间中，每个对等方将具有来自该文件的块子集，并且不同的对等方具有不同的子集。Alice周期性地（经TCP连接）询问每个临近对等方它们所具有的块列表。有了这个信息，Alice将对她当前还没有的块发出请求（TCP连接）
+
+  - Alice需要作出两个决定：
+
+    她应当从她的邻居请求哪些块？
+
+    她应当向她请求块的哪些邻居发送？
+
+    **最稀缺优先**（rarest first）技术：针对她没有的块在她邻居中决定**最稀缺的块**（最稀缺的块就是哪些在她的邻居中副本数量最少的块），并首先请求那些那些最稀缺的块。
+
+    一报还一报（未理解）
+
+- DHT（未补充）
+
+
+## Capter 3
+
+- 运输层协议为运行在不同主机上的应用进程之间提供了**逻辑通信**（logic communication）功能。从应用程序的角度看，通过逻辑通信，**运行不同进程的主机好像直接相连一样**；实际上，这些主机或许位于地球的两侧，通过许多路由器及多种不同类型的链路连接。
+
+- 在发送端，运输层将从发送应用程序进程接收的报文转换成**运输层分层**，用因特网术语来讲该分组称为**运输层报文（segment）**。
+
+- 在协议栈中，运输层刚好位于网络层之上。网络层提供了**主机之间**的逻辑通信，而运输层为运行在不同主机上的**进程之间**提供了逻辑通信。
+
+- 运输层中的TCP和UDP最基本的责任是，将**两个端系统间的IP的交付服务**扩展为运行在端系统上的**两个进程之间的交付服务**，这种称为**运输层的多路复用**（transport-layer multiplexing）和**多路分解**（demultiplexing）。
+
+  在接收端，运输层检查这些字段，标识出接收套接字，进而将报文段定向到该套接字，称为**多路分解**
+
+  在源主机从不同套接字中收集数据块，并为每个数据块封装上首部信息从而生成报文段，然后将报文段传递到网络层，称为**多路复用**
+
+- 运输层多路复用的要求
+
+  - 套接字有**唯一标识符**
+  - 每个报文段有**特殊字段**（**源端口号字段**source port number field和**目的端口号字段**destination port number field）来**指示该报文段所要交付到的套接字**
+
+- 端口号是一个**16bit**的数，则其大小为$$0\sim2^{16}$$
+
+  其中$$0\sim1023$$是**周知端口号**（well-known port number），是受到限制的，如HTTP（80），FTP（21）。
+
+- UDP套接字是一个**二元组**来全面标识的，该二元组包括一个目的IP地址和一个目的端口号，两个一样了，则在一个套接字里面
+
+  TCP套接字是一个**四元组**来标识的，包括源IP地址、源端口号、目的IP地址和目的端口号，四个一样了，则在一个套接字里面
+
+- UDP只是做了运输协议能够做的最少的工作，除了复用/分解功能以及少量的差错检验外，他几乎没有对IP增加别的东西。使用UDP时，在发送报文段之前，发送端和接收端运输层实体间**没有握手**，正因为如此，UDP被称为**无连接的**。
+
+- **DNS**是一个通常使用UDP应用层协议的例子。
+
+- UDP相对于TCP的优势
+
+  - 关于何时、发送什么数据的应用层控制更为精细
+  - 无需建立连接
+  - 无状态连接
+  - 分组首部开销小
+
+- 流行的因特网应用及其下面的运输协议
+
+  |      应用      | 应用层协议 | 下面的运输协议 |
+  | :------------: | :--------: | :------------: |
+  |    电子邮件    |    SMTP    |      TCP       |
+  |  远程终端访问  |   Telnet   |      TCP       |
+  |      Web       |    HTTP    |      TCP       |
+  |    文件传输    |    FTP     |      TCP       |
+  | 远程文件服务器 |    NFS     |    通常UDP     |
+  |   流式多媒体   |  通常专用  |    UDP或TCP    |
+  |   因特网电话   |  通常专用  |    UDP或TCP    |
+  |    网络管理    |    SNMP    |    通常UDP     |
+  |  路由选择协议  |    RIP     |    通常UDP     |
+  |    名字转换    |    DNS     |    通常UDP     |
+
+- UDP报文段结构
+
+  ![Pic06](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic09.jpeg)
+
 - ​
-
-
