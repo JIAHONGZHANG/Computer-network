@@ -359,3 +359,33 @@
   - 发送方的UDP对报文段中的所有16比特字的和进行反码运算，最后结果为检验和
   - 接收方拿文段中的16比特字的和进行比较，如果最后为1111111111111111，则没有问题，否则溢出说明里面出现了改变，则回卷
 
+- 数据可以通过一条可靠的信道传输。借助于可靠信道，传输数据比特就不会受到损坏或丢失，而且所有数据都是按照其发送数据进行交付。实现这种服务抽象是**可靠数据传输协议**（reliable data transfer protocol） 
+
+  - rdt1.0（**经完全可靠信道的可靠数据传输**）
+  - rdt2.0（多了**ACK**和**NACK**的rdt1.0）
+  - rdt2.1（packet上面加了序号1和0的rdt2.0）
+  - rdt2.2（**去掉NACK**改为在ACK上面加了序号1和0）
+  - rdt3.0（加了**timeout timer**）
+
+- rdt3.0是一个**停等协议**（stop-and-wait operation）。假设定义发送方（或通道）的利用率（utilization）为：发送方实际忙于将发送比特送进信道的那部分时间与发送时间之比，即
+  $$
+  U_{sender}={L/R\over{RTT+{L/R}}}
+  $$
+  这种方式利用率极低，为了解决利用率问题，使用**流水线**（pipelining）技术，即**不使用停等方式运行，允许发送方发送多个分组而无需确认等待**
+
+  ![Pic10](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic10.png)
+
+  流水线技术对可靠数据传输协议可带来如下影响：
+
+  - **必须增加序号范围**，因为每个输送中的分组（不计算重传的）必须有一个唯一的序号，而且也许有多个传输中的未确认的分组
+  - 协议的发送方和接收方两端也许必须**缓存多个分组**
+  - 所需序号范围和对缓冲的要求取决于数据传输协议如何处理丢失、损坏及延时过大的分组。解决流水线的差错恢复有两种基本的方法：**回退N步**（Go-Back-N, GBN）和**选择重传**（Selective Repeat, SR）
+
+- 回退N步动画 <https://media.pearsoncmg.com/aw/ecs_kurose_compnetwork_7/cw/content/interactiveanimations/go-back-n-protocol/index.html>
+
+
+  ![Pic11](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic11.png)
+
+- 回退N步的问题在于当窗口长度和带宽时延积都很大时，单个分组的差错就能够引起GBN重传大量的分组，许多分组没有必要重传，所以，**选择重传**（SR）协议通过让发送方仅重传那些**它怀疑在接收方出错（丢失或受损）的分组**而避免不必要的重传。
+
+  ​
