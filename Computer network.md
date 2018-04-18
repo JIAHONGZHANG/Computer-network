@@ -380,12 +380,73 @@
   - **必须增加序号范围**，因为每个输送中的分组（不计算重传的）必须有一个唯一的序号，而且也许有多个传输中的未确认的分组
   - 协议的发送方和接收方两端也许必须**缓存多个分组**
   - 所需序号范围和对缓冲的要求取决于数据传输协议如何处理丢失、损坏及延时过大的分组。解决流水线的差错恢复有两种基本的方法：**回退N步**（Go-Back-N, GBN）和**选择重传**（Selective Repeat, SR）
+  - **窗口长度**可根据接收方接收和缓存报文的能力、网络的拥塞成程度或两者情况进行设置。
 
-- 回退N步动画 <https://media.pearsoncmg.com/aw/ecs_kurose_compnetwork_7/cw/content/interactiveanimations/go-back-n-protocol/index.html>
+- 回退N步动画（GBN） <https://media.pearsoncmg.com/aw/ecs_kurose_compnetwork_7/cw/content/interactiveanimations/go-back-n-protocol/index.html>
 
 
   ![Pic11](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic11.png)
 
 - 回退N步的问题在于当窗口长度和带宽时延积都很大时，单个分组的差错就能够引起GBN重传大量的分组，许多分组没有必要重传，所以，**选择重传**（SR）协议通过让发送方仅重传那些**它怀疑在接收方出错（丢失或受损）的分组**而避免不必要的重传。
 
-  ​
+- 选择重传（SR）
+
+  <https://media.pearsoncmg.com/aw/ecs_kurose_compnetwork_7/cw/content/interactiveanimations/selective-repeat-protocol/index.html>
+
+- 可靠数据传输机制及其用途的总结
+
+  |     机制     |                          用途和说明                          |
+  | :----------: | :----------------------------------------------------------: |
+  |    检验和    |                检测在一个传输分组中的比特错误                |
+  |    定时器    |  用于超时/重传一个分组，可能因为该分组（或ACK）在信道中丢失  |
+  |     序号     | 用于为从发送方流向接收方的数据分组按顺序编号，检测出丢失或冗余的分组 |
+  |     确认     | 接收方用于告诉发送方已经收到，确认报文通常携带一个或多个分组的序号 |
+  |   否定确认   | 接收方用于告诉发送方没有收到，确认报文通常携带一个或多个分组的序号 |
+  | 窗口、流水线 |     发送方或许会被限制仅发送那些序号落在指定范围内的分组     |
+
+- TCP是**面向连接的**（connection-oriented），这是因为一个应用程序可以开始向另一个应用进程发送数据之前，这两个进程**必须先相互“握手”**，即它们**必须相互发送些预备报文段**，以建立确保数据传输的参数。
+
+- TCP协议**只在端系统中运行**，而不在中间的网络元素（路由器和链路层交换机）中运行，所以网络元素不会维持TCP连接状态。
+
+- TCP连接提供**全双工服务**（full-duplex service）：如果一台主机上的进程A与另一台主机主机上的进程B存在一条TCP连接，那么应用层数据就可以进程B流入A也可以进程A流入B。
+
+- TCP连接也是**点对点**（point-to-point）：单个发送方和单个接收方的连接。
+
+- TCP报文段的结构
+
+  ![Pic12](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic12.png)
+
+  - 32bit的**序号字段**（sequence number field）和32bit的**确认号字段**（acknowledgment number field）。这些字段被TCP发送方和接收方用来实现可靠数据传输服务。
+  - 16bit的**接收窗口字段**（receive window field），该字段用于**流量控制**。该字段用于指示接收方愿意接受的字节数量。
+  - 4bit的**首部长度字段**（header length field），该字段指示了以32bit的字为单位的TCP首部长度。由于TCP选项字段的原因，**TCP首部的长度是可变的**（通常选项字段为空，所以TCP首部的典型长度为**20字节**）
+  - 可选与变长的**选项字段**（options field），该字段用于发送方与接收方协商最大报文长度（MSS）时，或在高速网络环境下用作窗口调节因子时使用
+  - 6bit的**标志字段**（flag field）
+
+- TCP的一个报文段的序号（sequence number for segment）是该报文段首字节的字节流编号。
+
+  假设A向B发送500000字节的文件，由于MSS为1000字节，TCP将隐式地对数据流中每一个字节进行编号，数据流的首字节编号为0，则TCP将为该数据流构建500个报文段，给第一个报文段分配序号0，第二个报文段序号为1000，第三个为2000
+
+- TCP报文段的确认号是主机A**期望**从主机B收到的下一个字节的序号
+
+- **样本rtt**（SampleRTT）
+
+  ![Pic13](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic13.png)
+
+  **均值rtt**（EstimatedRTT）一旦获得一个新的样本rtt，TCP就会根据下列公式来更新均值rtt
+  $$
+  EstimatedRTT=(1-\alpha)\cdot EstimatedRTT+\alpha \cdot SampleRTT\\
+  \alpha =0.125
+  $$
+  **rtt偏差**（DevRTT），用于估计SampleRTT一般会偏离EstimatedRTT的程度
+  $$
+  DevRTT=(1-\beta)\cdot DevRTT+\beta \cdot|{SampleRTT-EstimatedRTT}|
+  $$
+  **超时间隔**（TimeoutInterval），推荐初始值为1秒
+  $$
+  TimeoutInterval=EstimatedRTT+4\cdot DevRTT
+  $$
+
+- 快速重传（TCP fast retransmit）
+
+  一旦收到3个冗余的ACK，TCP就执行快速重传，即在**该报文段的定时器过期之前重传丢失的报文段**
+
