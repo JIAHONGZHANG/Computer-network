@@ -74,7 +74,6 @@
   $$
   d_{端到端}=N{L\over{R}}
   $$
-  ​
 
 - 从该链路的起点到路由器B传播所需要的时间是**传播时延**。
 
@@ -382,6 +381,19 @@
   - 所需序号范围和对缓冲的要求取决于数据传输协议如何处理丢失、损坏及延时过大的分组。解决流水线的差错恢复有两种基本的方法：**回退N步**（Go-Back-N, GBN）和**选择重传**（Selective Repeat, SR）
   - **窗口长度**可根据接收方接收和缓存报文的能力、网络的拥塞成程度或两者情况进行设置。
 
+- Slow Start (SS) & Additive Increase Multiplicative (AIMD)
+
+  控制cwnd，当一开始的时候，cwnd设置为一个很小的常数，而ssthresh设置为一个很大的常数这样SS可以快速探测到网络的环境；当cwnd小于ssthresh时候，cwnd从1、2、4、8增长，当cwnd大于ssthresh时候，$$cwnd=cwnd+{1\over cwnd}$$（AIMD），当重复接收到3个重复的ACK的时候，ssthresh减半，cwnd减半；当发生timeout的时候，ssthresh变为cwnd的一半，cwnd变为1。
+
+- TCP-Reno
+
+  - Timeout的时候cwnd = 1
+  - 3个重复的ACK的时候cwnd = cwnd/2
+
+- TCP-Tahoe
+
+  - Timeout和3个重复的ACK的时候cwnd = 1
+
 - 回退N步动画（GBN） <https://media.pearsoncmg.com/aw/ecs_kurose_compnetwork_7/cw/content/interactiveanimations/go-back-n-protocol/index.html>
 
 
@@ -430,7 +442,7 @@
 
 - **样本rtt**（SampleRTT）
 
-  ![Pic13](https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic13.png)
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic13.png" width="300px" />
 
   **均值rtt**（EstimatedRTT）一旦获得一个新的样本rtt，TCP就会根据下列公式来更新均值rtt
   $$
@@ -439,7 +451,8 @@
   $$
   **rtt偏差**（DevRTT），用于估计SampleRTT一般会偏离EstimatedRTT的程度
   $$
-  DevRTT=(1-\beta)\cdot DevRTT+\beta \cdot|{SampleRTT-EstimatedRTT}|
+  DevRTT=(1-\beta)\cdot DevRTT+\beta \cdot|{SampleRTT-EstimatedRTT}|\\
+  \beta=0.25
   $$
   **超时间隔**（TimeoutInterval），推荐初始值为1秒
   $$
@@ -448,5 +461,86 @@
 
 - 快速重传（TCP fast retransmit）
 
-  一旦收到3个冗余的ACK，TCP就执行快速重传，即在**该报文段的定时器过期之前重传丢失的报文段**
+  一旦收到**3个**冗余的ACK，TCP就执行快速重传，即在**该报文段的定时器过期之前重传丢失的报文段**
 
+- 流量控制（flow-control service）
+
+  TCP为它的应用程序提供**流量控制服务**以消除发送方使接收方缓存溢出的可能性。流量控制是一个**速度匹配**的服务，即发送方的发送速率和接收方应用程序读取速率相匹配
+
+  TCP通过让发送方维护一个称为**接收窗口**（receive window）的变量来提供流量控制。因为TCP是**全双工通信**，在连接两段的发送方都各自维护一个接收窗口。定义以下变量（A发送B）：
+
+  - LastByteRead：主机B上的应用程序从缓存读出的数据流的最后一个字节的编号
+  - LastByteRcvd：从网络中到达并已经放入主机B接收缓存中的数据流的最后一个自己的编号
+
+  由于TCP不允许以分配的缓存溢出，则
+  $$
+  LastByteRcvd-LastByteRead\le RcvBuffer
+  $$
+
+
+
+
+  接收窗口用rwnd表示，根据缓存可用空间的数量来设置
+$$
+  rwnd=RcvBuffer-[LastByteRcvd-LastByteRead]
+$$
+  主机B通过把当前的rwnd值放入它发给主机A的报文段接收窗口字段中，通知A还有多少空间。
+
+  开始时，主机B设置$$rwnd=RcvBuffer$$，主机A在该连接的整个生命周期保证
+$$
+  LastByteSent-LastByteAcked\le rwnd
+$$
+
+- 假设主机B接收缓存满了，使得rwnd=0。在将rwnd=0通告给主机A之后，还要假设主机B没有任何数据要发给主机A，则当主机B接收窗口为0，主机A**继续发送只有一个字节数据**的报文段，这个报文段将会被接收方确认，最终缓存清空，然后确认报文中将包含一个**非0的rwnd值**。
+
+- IP地址长度为32Bits（4字节），地址一般以点分十进制记法。
+
+- 为了获取一块IP地址用于一个组织的子网，某网络管理员也许会与他的ISP联系，该ISP可能会从分给它的更大的地址块中提供一些地址。某组织一旦获得一块地址，它就可以为本组织内的主机与路由器接口逐个分配IP地址。系统管理员通常手工配置路由器的IP地址。主机地址也能手动配置，但是这项任务目前通常更多地是使用**动态主机配置协议**（Dynamic Host Configuration, DHCP）。
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic14.png" width="300px" />
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic15.png" width="300px" />
+
+- 网络地址转换（Network Address Translation, NAT）
+
+  NAT使能路由器对于外部世界来说像一个具有单一的IP地址的单一设备。
+
+- IPv6
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic16.png" width="300px" />
+
+  - 版本
+
+    4比特字段用来标识IP版本号
+
+  - 流量类型
+
+    8比特字段与IPv4看到的TOS字段含义相似
+
+  - 流标签
+
+    20比特字段用于标识一条数据报的流
+
+  - 有效载荷长度
+
+    16比特作为无符号整数，给出了IPv6数据报中跟在定长的40字节数据报首部后面的字节数量
+
+  - 下一个首部
+
+    需要交给哪个协议（TCP或UDP）
+
+  - 跳限制
+
+    转发数据报的每台路由器将对该字段的内容减1，到0则丢弃该数据报
+
+  - 源地址和目的地址
+
+    128比特
+
+  - 数据
+
+    IPv6数据报的有效载荷部分
+
+- 主机通常和第一台路由器相连，该路由器即为该主机的**默认路由器**（default router），又称为该主机的**第一跳路由器**（first-hop router）。每当主机发送一个分组的时候，该分组传送给它的默认路由器。我们将源主机的默认路由器称为**源路由器**（source router），目的主机的默认路由器称为**目的路由器**（destination router）。
+
+- 
