@@ -543,4 +543,153 @@ $$
 
 - 主机通常和第一台路由器相连，该路由器即为该主机的**默认路由器**（default router），又称为该主机的**第一跳路由器**（first-hop router）。每当主机发送一个分组的时候，该分组传送给它的默认路由器。我们将源主机的默认路由器称为**源路由器**（source router），目的主机的默认路由器称为**目的路由器**（destination router）。
 
-- 
+- 全局式路由选择算法（gloal routing algorithm）
+
+  全局式算法具有关于连通性和链路费用方面的完整信息。实践中，具有全局信息的算法称为**链路状态算法**（Link State，LS），因为该算法**必须知道网络中每条链路的费用**。
+
+- 分散式路由选择算法（decentralized routing algotithm）
+
+  以迭代、分布式的方式计算出最低费用路径。没有结点拥有关于所有网络链路费用的完整信息，而每个结点仅有关于其直接相连费用知识即可开始工作。**距离向量**（Distance-Vector，DV）算法即是此类算法。
+
+- 链路层（link layer）
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic17.png"/>
+
+- 链路层提供的服务
+
+  - 成帧（framing）
+
+    在每个网络层数据报经链路传送之前，几乎所有的链路层协议都要将其用链路层帧封装起来
+
+  - 链路接入
+
+    **媒体访问控制**（Medium Access Control， MAC）规定了帧在链路上的传输规则
+
+  - 可靠交付
+
+  - 差错检测和纠正
+
+    由硬件实现
+
+- MAC（LAN, physical, Ethernet）地址
+
+  MAC地址为6字节，则有$$2^{48}$$种可能的MAC地址。如5C-66-AB-90-75-B1，16进制，每个数字代表4比特。每个适配器都有一个独特的MAC地址。
+
+  MAC广播地址（broadcast address）为48个连续的1，也就是FF-FF-FF-FF-FF-FF
+
+- 地址解析协议（ARP）
+
+  ARP只适用于同一个子网上的主机和路由器接口解析IP地址
+
+  ARP table:
+
+  |     IP地址      |      MAC地址      |   TTL    |
+  | :-------------: | :---------------: | :------: |
+  | 222.222.222.221 | 88-B2-2F-54-1A-0F | 13:45:00 |
+  | 222.222.222.223 | 5C-66-AB-90-75-B1 | 13:52:00 |
+
+  如果ARP table没有对应的IP地址，首先发送方构建一个称为**ARP分组**（ARP packet）的特殊分组，使用MAC广播地址发送给周围的适配器，每个适配器都把该帧中的ARP分组向上传递给ARP模块，模块检查它的IP地址是否和ARP分组中的目的IP地址相匹配，若是匹配的话，则发送回一个带有所希望映射的响应ARP分组。发送方接收到后更新ARP table。
+
+  若是要**发送到子网以外**，首先把分组发给第一跳路由，然后不断传递最后到达目的地
+
+- 以太网(Ethernet)结构
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic18.png"/>
+
+- 以太网帧结构
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic19.png"/>
+
+  - 前同步码(preamble)
+
+    8字节，前7字节都是10101010，最后一个为10101011。用于时钟同步
+
+  - 目的地址(destination address)
+
+    6字节，目的地址只接收符合自己的地址和广播地址，其他丢弃
+
+  - 源地址(source address)
+
+  - 类型字段(type)
+
+    2字节，允许以太网复用多种网络层协议，为了把一层中的某协议与上层协议结合起来
+
+  - 数据字段(data or payload)
+
+    46～1500字节，多则分片，少则填充
+
+  - CRC（循环冗余检测）
+
+    接收适配器检测帧中是否引入了差错
+
+- 以太网向网络层提供不可靠服务(unreliable)和无连接(connectionless)，在NIC中没有进行握手，检测不论成功与否都不会回发ack或者nack。
+
+- 以太网交换机(Ethernet switch)
+
+  - 过滤(filtering)和转发(forwarding)功能
+
+  - 透明(transparent)
+
+    发送方不知道交换机存在
+
+  - 即插即用(plug-and-play)和自学习(self-learning)
+
+    交换机表(switch table)
+
+    |      MAC地址      | 接口 | 时间 |
+    | :---------------: | :--: | :--: |
+    | 01-12-23-45-67-45 |  1   | 9:35 |
+    |        ...        | ...  | ...  |
+
+    1）交换机表初始为空
+
+    2）对于每个接口接收到的入帧，交换机表存储源地址，该帧到达的接口和当前时间
+
+    3）在一段老化期(aging time)后，交换机没有收到该地址作为源地址的帧，则表中删除该地址
+
+- 交换机、集线器和路由器比较
+
+  |          | 集线器 | 路由器 | 交换机 |
+  | -------- | ------ | ------ | ------ |
+  | 流量隔离 | 无     | 有     | 有     |
+  | 即插即用 | 有     | 无     | 有     |
+  | 优化路由 | 无     | 有     | 无     |
+
+  
+
+- 无线(wireless)和有线(wired)差别
+
+  - 递减的信号强度(decreased signal strength)
+  - 来自于其他源的干扰(interference from other sources)
+  - 多径传播(multipath propagation)
+
+- Path Loss
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic20.png"/>
+
+- 信噪比(Signal-to-Noise ratio, SNR)
+
+  信噪比约大，越容易在干扰环境下接收到信息
+
+- 比特差错率(BER)
+
+  - 对于给定的调制方案，SNR越高，BER越低。增加传输功率可以降低BER，但是更加耗电
+  - 对于给定的SNR，具有较高比特传输率的调制技术（无论差错与否）将具有较高的BER
+  - 物理层调制技术的动态选择能用于适配对信道条件的调制技术
+
+- 802.11体系结构的基本构件模块是**基本服务集**(Basic service set, BSS)。一个BBS包含一个或者多个无线站点和一个在802.11术语中称为**接入点**(Access Point, AP)的**中央基站**(base station)。
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic21.png"/>
+
+- 接入点的主动扫描(active scanning)和被动扫描(passive scanning)
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic22.png"/>
+
+- 视频（当前画面和下一帧画面）
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic23.png"/>
+
+- 流式存储视频(Streaming stored video)
+
+  <img src="https://raw.githubusercontent.com/JIAHONGZHANG/Computer-network/master/src/Pic24.png"/>
+
